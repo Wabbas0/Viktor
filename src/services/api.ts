@@ -1,5 +1,3 @@
-// src/services/api.ts
-
 import axios, { AxiosResponse } from 'axios';
 
 interface BlogPost {
@@ -26,34 +24,34 @@ interface SearchOptions {
 const API_BASE_URL = 'https://cms.viktor.ai';
 
 export async function fetchBlogPosts(
-  page = 1,
-  limit = 10,
-  filters?: FilterOptions,
-  search?: SearchOptions
-): Promise<PaginationResponse> {
-  let url = `${API_BASE_URL}/blogposts?_start=${(page - 1) * limit}&_limit=${limit}`;
-
-  if (filters?.category) {
-    url += `&blogpost_categories.id=${filters.category}`;
+    page = 1,
+    limit = 10,
+    filters?: FilterOptions,
+    search?: SearchOptions
+  ): Promise<PaginationResponse> {
+    let url = `${API_BASE_URL}/blogposts?_start=${(page - 1) * limit}&_limit=${limit}`;
+  
+    if (filters?.category) {
+      url += `&blogpost_categories.id=${filters.category}`;
+    }
+  
+    if (filters?.author) {
+      url += `&author.id=${filters.author}`;
+    }
+  
+    if (search?.title) {
+      url += `&title_contains=${encodeURIComponent(search.title)}`;
+    }
+  
+    const response: AxiosResponse<BlogPost[]> = await axios.get(url);
+    const countResponse: AxiosResponse<number> = await axios.get(`${API_BASE_URL}/blogposts/count`);
+  
+    return {
+      count: countResponse.data,    
+      data: response.data,
+    };
   }
-
-  if (filters?.author) {
-    url += `&author.id=${filters.author}`;
-  }
-
-  if (search?.title) {
-    url += `&title_contains=${encodeURIComponent(search.title)}`;
-  }
-
-  const response: AxiosResponse<BlogPost[]> = await axios.get(url);
-  const countResponse: AxiosResponse<number> = await axios.get(`${API_BASE_URL}/blogposts/count`);
-
-  return {
-    count: countResponse.data,
-    data: response.data,
-  };
-}
-
+  
 export async function fetchCategories(): Promise<string[]> {
   const response: AxiosResponse<string[]> = await axios.get(`${API_BASE_URL}/blogpost-categories`);
   return response.data;

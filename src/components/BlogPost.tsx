@@ -4,7 +4,6 @@ interface BlogPostProps {
   id: number;
   title: string;
   content: string;
-  // Add more properties as per your API response
 }
 
 const BlogPost: React.FC<BlogPostProps> = ({ title, content }) => {
